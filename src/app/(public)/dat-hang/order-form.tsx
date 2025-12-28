@@ -92,13 +92,28 @@ export default function OrderForm({ prefillItems }: Props) {
         ];
       });
 
+      // Gộp các item cùng product_id để tránh trùng khóa khi insert
+      const aggregated = expandedItems.reduce<Record<
+        string,
+        { product_id: string; quantity: number; price: number | null }
+      >>((acc, curr) => {
+        if (!acc[curr.product_id]) {
+          acc[curr.product_id] = { ...curr };
+        } else {
+          acc[curr.product_id].quantity += curr.quantity;
+          // giữ giá đã có, chỉ cập nhật nếu chưa có
+          if (acc[curr.product_id].price == null) acc[curr.product_id].price = curr.price;
+        }
+        return acc;
+      }, {});
+
       const result = await submitOrder({
         name: form.name,
         phone: form.phone,
         address: form.address,
         note: form.note,
         payment_method: form.payment_method,
-        items: expandedItems
+        items: Object.values(aggregated)
       });
       setMessage(result.message);
       if (result.success) {
