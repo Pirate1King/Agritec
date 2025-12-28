@@ -1,11 +1,12 @@
+import Link from "next/link";
+
 import { Hero } from "@/components/hero";
 import { SectionHeader } from "@/components/section-header";
 import { SolutionCard } from "@/components/solution-card";
+import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
-import { getSolutions, getProducts } from "@/lib/queries";
-import { formatCurrency } from "@/lib/utils";
-import Link from "next/link";
 import { ScrollCards } from "@/components/scroll-cards";
+import { getSolutions, getProducts } from "@/lib/queries";
 
 export default async function HomePage() {
   const [solutions, products] = await Promise.all([getSolutions(), getProducts()]);
@@ -44,7 +45,7 @@ export default async function HomePage() {
       points: [
         "Sát trùng chuồng trại, thiết bị, phương tiện",
         "Giảm mầm bệnh tồn lưu trong môi trường",
-        "Giảm mùi hại, ẩm chuồng",
+        "Giảm mùi hôi, ẩm chuồng",
         "Hạn chế tái nhiễm chéo trong đàn"
       ]
     }
@@ -57,7 +58,7 @@ export default async function HomePage() {
     },
     {
       title: "Bước 02 · Chọn nhóm giải pháp phù hợp",
-      points: ["Acid hữu cơ", "Butyrate", "Tannin", "Sát trùng môi trường", "Các thể dạng đến từ loạt combo"]
+      points: ["Acid hữu cơ", "Butyrate", "Tannin", "Sát trùng môi trường", "Các thẻ dạng đến từ loạt combo"]
     },
     {
       title: "Bước 03 · Xây dựng phác đồ sử dụng",
@@ -102,24 +103,11 @@ export default async function HomePage() {
         <SectionHeader
           eyebrow="Sản phẩm nổi bật"
           title="Thiết bị, hoá chất, phụ gia được kiểm chứng"
-          description="Acidex/Globacid sát trùng đường nước, Mixtron pha trộn, cảm biến & điều khiển tới; đặt lẻ hoặc combo."
+          description="Acidex/Globacid sát trùng đường nước, Mixtron pha trộn, cảm biến & điều khiển tới; hỗ trợ lắp đặt và tối ưu combo."
         />
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {featuredProducts.map((product) => (
-            <div key={product.id} className="rounded-2xl border border-surface-border bg-white p-6 shadow-soft">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{product.category}</p>
-              <h3 className="mt-2 font-heading text-xl text-brand-blue">{product.name}</h3>
-              <p className="mt-2 text-slate-600">{product.excerpt}</p>
-              <div className="mt-4 text-lg font-semibold text-slate-900">{formatCurrency(product.price)}</div>
-              <div className="mt-4 flex gap-3">
-                <Button variant="primary" size="sm" asChild>
-                  <Link href={`/san-pham/${product.slug}`}>Chi tiết</Link>
-                </Button>
-                <Button variant="accent" size="sm" asChild>
-                  <Link href={`/dat-hang?product=${product.slug}`}>Đặt hàng</Link>
-                </Button>
-              </div>
-            </div>
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
