@@ -26,8 +26,8 @@ module.exports = {
         }
       },
       fontFamily: {
-        heading: ["var(--font-sora)", "var(--font-manrope)"],
-        body: ["var(--font-inter)"]
+        heading: ["var(--font-manrope)", "var(--font-inter)", "var(--font-sora)"],
+        body: ["var(--font-inter)", "var(--font-manrope)"]
       },
       boxShadow: {
         soft: "0 16px 40px rgba(15, 23, 42, 0.08)"

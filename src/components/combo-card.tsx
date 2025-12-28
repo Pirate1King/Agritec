@@ -35,7 +35,7 @@ export function ComboCard({ combo, solutionSlug }: Props) {
           <Link href={`/dat-hang?combo=${combo.slug}&solution=${solutionSlug}`}>Đặt combo giải pháp này</Link>
         </Button>
         <Button variant="ghost" size="sm" asChild>
-          <Link href="https://zalo.me" target="_blank">
+          <Link href="https://zalo.me/0977791412" target="_blank">
             Tư vấn Zalo
           </Link>
         </Button>

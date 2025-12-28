@@ -3,6 +3,8 @@ import { SectionHeader } from "@/components/section-header";
 import { Hero } from "@/components/hero";
 import { getSolutions } from "@/lib/queries";
 
+const HERO_IMAGE = "https://www.spireenergy.com/sites/default/files/styles/hero_image/public/2020-03/rsz_gettyimages-177750786.jpg?itok=zyV3xtCw";
+
 export default async function SolutionsPage() {
   const solutions = await getSolutions();
 
@@ -12,9 +14,9 @@ export default async function SolutionsPage() {
         <Hero
           title="Giải pháp vận hành trang trại chuẩn B2B"
           subtitle="Mỗi giải pháp được thiết kế với bộ sản phẩm, quy trình và combo cụ thể để triển khai nhanh."
-          imageUrl="https://images.unsplash.com/photo-1457530378978-8bac673b8062?auto=format&fit=crop&w=1600&q=80"
+          imageUrl={HERO_IMAGE}
           primaryCta={{ label: "Đặt hàng", href: "/dat-hang" }}
-          secondaryCta={{ label: "Tư vấn Zalo", href: "https://zalo.me" }}
+          secondaryCta={{ label: "Tư vấn Zalo", href: "https://zalo.me/0977791412" }}
         />
       </div>
 

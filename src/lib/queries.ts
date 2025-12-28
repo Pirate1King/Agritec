@@ -1,5 +1,7 @@
+import { cache } from "react";
 import { sampleSolutions, sampleProducts } from "@/data/static";
 import { getServerSupabaseClient } from "./supabase/server";
+import { getServiceSupabase } from "./supabase/service";
 import { Database } from "./supabase/types";
 import { Product, Solution, SolutionCombo } from "./types";
 
@@ -77,24 +79,34 @@ const mapSolution = (row: SolutionRow): Solution => ({
     })) || []
 });
 
-export async function getSolutions(): Promise<Solution[]> {
-  const supabase = getServerSupabaseClient();
+const getReadableClient = () => {
+  // Prefer service client to bypass RLS for public listing
+  try {
+    return getServiceSupabase();
+  } catch {
+    const anon = getServerSupabaseClient();
+    return anon;
+  }
+};
+
+export const getSolutions = cache(async (): Promise<Solution[]> => {
+  const supabase = getReadableClient();
   if (!supabase) return sampleSolutions;
 
   const { data, error } = await supabase
     .from("solutions")
     .select(
-      "*, solution_combos(*, combo_items(*, products(*, product_images(*)))), solution_products(product_id, quantity, products(*, product_images(*)))"
+      "id, title, slug, excerpt, hero_url, pdf_url, benefits, is_published, solution_combos(id, name, slug, description, price, is_active, combo_items(product_id, quantity, products(id, name, price, unit, category, slug))), solution_products(product_id, quantity, products(id, name, price, unit, category, slug))"
     )
-    .eq("is_published", true);
+    .or("is_published.is.null,is_published.eq.true");
 
   if (error || !data) return sampleSolutions;
 
   return data.map(mapSolution);
-}
+});
 
-export async function getSolutionBySlug(slug: string): Promise<Solution | null> {
-  const supabase = getServerSupabaseClient();
+export const getSolutionBySlug = cache(async (slug: string): Promise<Solution | null> => {
+  const supabase = getReadableClient();
   if (!supabase) return sampleSolutions.find((s) => s.slug === slug) || null;
 
   const { data, error } = await supabase
@@ -109,50 +121,47 @@ export async function getSolutionBySlug(slug: string): Promise<Solution | null> 
 
   const mapped = mapSolution(data as SolutionRow);
 
-  // Fallback: nếu combos chưa lấy được, query riêng để tránh supabase join rỗng
-  if (!mapped.combos || mapped.combos.length === 0) {
-    const { data: combosData } = await supabase
-      .from("solution_combos")
-      .select("*, combo_items(*, products(*, product_images(*)))")
-      .eq("solution_id", mapped.id)
-      .eq("is_active", true);
-    if (combosData) {
-      mapped.combos =
-        combosData.map((combo) => ({
-          id: combo.id,
-          name: combo.name,
-          slug: combo.slug,
-          description: combo.description || undefined,
-          price: combo.price || undefined,
-          items:
-            (combo as any).combo_items?.map((item: any) => ({
-              product_id: item.product_id,
-              quantity: item.quantity,
-              product: item.products ? mapProduct(item.products as ProductRow) : undefined
-            })) || []
-        })) || [];
-    }
+  // Luôn truy vấn combo riêng để chắc chắn lấy đầy đủ
+  const { data: combosData } = await supabase
+    .from("solution_combos")
+    .select("*, combo_items(*, products(*, product_images(*)))")
+    .eq("solution_id", mapped.id);
+  if (combosData) {
+    mapped.combos =
+      combosData.map((combo) => ({
+        id: combo.id,
+        name: combo.name,
+        slug: combo.slug,
+        description: combo.description || undefined,
+        price: combo.price || undefined,
+        items:
+          (combo as any).combo_items?.map((item: any) => ({
+            product_id: item.product_id,
+            quantity: item.quantity,
+            product: item.products ? mapProduct(item.products as ProductRow) : undefined
+          })) || []
+      })) || [];
   }
 
   return mapped;
-}
+});
 
-export async function getProducts(): Promise<Product[]> {
-  const supabase = getServerSupabaseClient();
+export const getProducts = cache(async (): Promise<Product[]> => {
+  const supabase = getReadableClient();
   if (!supabase) return sampleProducts;
 
   const { data, error } = await supabase
     .from("products")
     .select("*, product_images(*), solution_products(quantity, solutions(id, slug, title))")
-    .eq("is_published", true)
+    .or("is_published.is.null,is_published.eq.true")
     .order("created_at", { ascending: false });
 
   if (error || !data) return sampleProducts;
   return (data as ProductRow[]).map(mapProduct);
-}
+});
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
-  const supabase = getServerSupabaseClient();
+export const getProductBySlug = cache(async (slug: string): Promise<Product | null> => {
+  const supabase = getReadableClient();
   if (!supabase) return sampleProducts.find((p) => p.slug === slug) || null;
 
   const { data, error } = await supabase
@@ -174,10 +183,10 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     )
     .filter(Boolean) as Solution[];
   return mapped;
-}
+});
 
-export async function getComboBySlug(slug: string): Promise<SolutionCombo | null> {
-  const supabase = getServerSupabaseClient();
+export const getComboBySlug = cache(async (slug: string): Promise<SolutionCombo | null> => {
+  const supabase = getReadableClient();
   if (!supabase) return null;
 
   const { data, error } = await supabase
@@ -200,9 +209,9 @@ export async function getComboBySlug(slug: string): Promise<SolutionCombo | null
     price: row.price || undefined,
     items:
       row.combo_items?.map((item) => ({
-        product_id: item.product_id,
-        quantity: item.quantity,
-        product: item.products ? mapProduct(item.products) : undefined
-      })) || []
+      product_id: item.product_id,
+      quantity: item.quantity,
+      product: item.products ? mapProduct(item.products) : undefined
+    })) || []
   };
-}
+});

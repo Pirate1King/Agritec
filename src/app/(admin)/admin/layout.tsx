@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ReactNode } from "react";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
+import { AdminUserMenu } from "@/components/admin/user-menu";
 
 const navItems = [
   { href: "/admin/solutions", label: "Solutions" },
@@ -8,16 +11,31 @@ const navItems = [
   { href: "/admin/orders", label: "Orders" }
 ];
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  const supabase = getServerSupabaseClient();
+  if (!supabase) {
+    redirect("/admin/login");
+  }
+
+  const {
+    data: { session }
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    redirect("/admin/login");
+  }
+
+  const userEmail =
+    session.user.email ||
+    (typeof session.user.user_metadata?.email === "string" ? session.user.user_metadata.email : null);
+
   return (
     <div className="min-h-screen bg-surface-light">
       <header className="flex items-center justify-between border-b border-surface-border bg-white px-8 py-4">
         <Link href="/" className="text-sm font-semibold text-brand-blue">
           AGRITEC Admin
         </Link>
-        <Button variant="ghost" size="sm">
-          Đăng xuất
-        </Button>
+        <AdminUserMenu email={userEmail} />
       </header>
       <div className="grid gap-6 px-6 py-6 md:grid-cols-[260px,1fr]">
         <aside className="rounded-2xl border border-surface-border bg-white p-4 shadow-soft">

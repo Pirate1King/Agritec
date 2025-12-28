@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { submitOrder } from "@/app/actions/orders";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/utils";
 import { useCartStore, type CartItem } from "@/store/cart-store";
-import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 
 type Props = {
@@ -33,6 +32,7 @@ export default function OrderForm({ prefillItems }: Props) {
   }, [prefillItems, setItems]);
 
   const total = items.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
+  const transferReference = form.phone ? `AGRITEC ${form.phone}` : "AGRITEC + SĐT của bạn";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,9 +138,7 @@ export default function OrderForm({ prefillItems }: Props) {
                   key={method.key}
                   type="button"
                   className={`rounded-2xl border px-4 py-3 text-sm font-semibold ${
-                    form.payment_method === method.key
-                      ? "border-brand-blue text-brand-blue"
-                      : "border-surface-border text-slate-700"
+                    form.payment_method === method.key ? "border-brand-blue text-brand-blue" : "border-surface-border text-slate-700"
                   }`}
                   onClick={() => setForm((f) => ({ ...f, payment_method: method.key as "cod" | "bank_transfer" }))}
                 >
@@ -149,6 +147,19 @@ export default function OrderForm({ prefillItems }: Props) {
               ))}
             </div>
           </div>
+          {form.payment_method === "bank_transfer" && (
+            <div className="rounded-2xl border border-surface-border bg-surface-light p-4 text-sm text-slate-700">
+              <p className="font-semibold text-brand-blue">Thông tin chuyển khoản</p>
+              <p>Ngân hàng: TP Bank</p>
+              <p>
+                Số tài khoản: <span className="font-semibold">00947260262</span>
+              </p>
+              <p>Chủ tài khoản: AGRITEC</p>
+              <p className="mt-2 text-xs text-slate-600">
+                Nội dung chuyển: <span className="font-semibold text-brand-blue">{transferReference}</span> (ghi SĐT để định danh).
+              </p>
+            </div>
+          )}
         </div>
         <div className="flex items-center justify-between rounded-2xl bg-surface-light px-4 py-3">
           <p className="text-sm font-semibold text-slate-800">Tổng tạm tính</p>
@@ -157,11 +168,6 @@ export default function OrderForm({ prefillItems }: Props) {
         {message && <p className="text-sm text-brand-blue">{message}</p>}
         <Button type="submit" variant="accent" size="lg" disabled={isPending} className="w-full">
           {isPending ? "Đang xử lý..." : "Gửi đơn hàng"}
-        </Button>
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="https://zalo.me" target="_blank">
-            Tư vấn qua Zalo
-          </Link>
         </Button>
       </div>
     </form>

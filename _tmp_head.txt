@@ -1,0 +1,30 @@
+import { Hero } from "@/components/hero";
+import { SectionHeader } from "@/components/section-header";
+import { SolutionCard } from "@/components/solution-card";
+import { Button } from "@/components/ui/button";
+import { getSolutions, getProducts } from "@/lib/queries";
+import { formatCurrency } from "@/lib/utils";
+import Link from "next/link";
+
+export default async function HomePage() {
+  const [solutions, products] = await Promise.all([getSolutions(), getProducts()]);
+  const featuredProducts = products.slice(0, 3);
+
+  const heGiaiPhap = [
+    {
+      title: "Ki?m soát tiêu ch?y không d?c hi?u",
+      points: [
+        "Áp d?ng cho tiêu ch?y do vi khu?n, virus, d?c t?, n?m m?c, rong t?o, stress",
+        "Không ph? thu?c nguyên nhân c? th?",
+        "Gi?i pháp sinh h?c thay th? kháng sinh",
+        "Phù h?p m?i giai do?n nuôi"
+      ]
+    },
+    {
+      title: "H? tr? tiêu hoá & du?ng ru?t",
+      points: [
+        "Cân b?ng h? vi sinh du?ng ru?t",
+        "Gi?m phân l?ng, phân không d?nh hình",
+        "Tang h?p thu dinh du?ng",
+        "Giúp dàn ?n d?nh và d?ng d?u hon"
+      ]

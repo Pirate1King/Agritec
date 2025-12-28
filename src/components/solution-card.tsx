@@ -31,7 +31,7 @@ export function SolutionCard({ solution }: Props) {
         </div>
         <div className="mt-auto flex flex-wrap gap-3">
           <Button variant="primary" size="sm" asChild>
-            <Link href={`/giai-phap/${solution.slug}`}>Xem chi tiết</Link>
+            <Link href={`/giai-phap/${solution.slug}`}>Chi tiết</Link>
           </Button>
           <Button variant="accent" size="sm" asChild>
             <Link href={`/dat-hang?solution=${solution.slug}`}>Đặt giải pháp</Link>

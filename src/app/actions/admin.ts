@@ -9,25 +9,39 @@ import { randomUUID } from "crypto";
 type OrderStatus = Database["public"]["Tables"]["orders"]["Row"]["status"];
 type ActionResult = { success: boolean; message: string };
 
+const slugifyText = (val: string) =>
+  val
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+
 export async function upsertSolution(prev: ActionResult | undefined, formData: FormData): Promise<ActionResult> {
   const supabase = getServiceSupabase();
 
   const solutionId = formData.get("solution_id")?.toString() || null;
   const title = formData.get("title")?.toString().trim() || "";
-  const slug = formData.get("slug")?.toString().trim() || "";
+  const slugInput = formData.get("slug")?.toString().trim() || "";
+  const slug = slugInput || slugifyText(title);
   const excerpt = formData.get("excerpt")?.toString().trim() || "";
-  const hero_url = formData.get("hero_url")?.toString().trim() || null;
+  const heroUrlInput = formData.get("hero_url")?.toString().trim() || null;
+  const heroFile = formData.get("hero_upload") as File | null;
   const pdfFile = formData.get("pdf") as File | null;
   const problem = formData.get("problem")?.toString().trim() || null;
   const solution = formData.get("solution")?.toString().trim() || null;
   const productIds = formData.getAll("productIds").map((id) => id.toString()).filter(Boolean);
   const combosRaw = formData.get("combos_json")?.toString();
-  let combosPayload: {
-    id?: string;
-    name: string;
-    description?: string | null;
-    items: { product_id: string; quantity: number }[];
-  }[] = [];
+
+  let combosPayload:
+    | {
+        id?: string;
+        name: string;
+        description?: string | null;
+        items: { product_id: string; quantity: number }[];
+      }[]
+    | [] = [];
   if (combosRaw) {
     try {
       combosPayload = JSON.parse(combosRaw);
@@ -36,15 +50,25 @@ export async function upsertSolution(prev: ActionResult | undefined, formData: F
     }
   }
 
-  if (!title || !slug || !excerpt) {
-    return { success: false, message: "Thiếu thông tin bắt buộc" };
+  if (!title || !excerpt) return { success: false, message: "Thiếu thông tin bắt buộc" };
+
+  // slug uniqueness
+  if (!solutionId) {
+    const { data: existing } = await supabase.from("solutions").select("id").eq("slug", slug).maybeSingle();
+    if (existing) return { success: false, message: "Slug đã tồn tại, chọn tên khác" };
+  } else {
+    const { data: existing } = await supabase.from("solutions").select("id").eq("slug", slug).neq("id", solutionId);
+    if (existing && existing.length > 0) return { success: false, message: "Slug đã tồn tại, chọn tên khác" };
   }
 
   let idToUse = solutionId;
+  let heroUrlToUse: string | null = heroUrlInput;
+
+  // create first so we have id for uploads
   if (!idToUse) {
     const { data, error } = await supabase
       .from("solutions")
-      .insert({ title, slug, excerpt, hero_url, problem, solution, is_published: true })
+      .insert({ title, slug, excerpt, hero_url: heroUrlToUse, problem, solution, is_published: true })
       .select("id")
       .single();
     if (error || !data) return { success: false, message: error?.message || "Không thêm được giải pháp" };
@@ -64,20 +88,33 @@ export async function upsertSolution(prev: ActionResult | undefined, formData: F
     pdf_url = getPublicUrl("solutions", filePath);
   }
 
+  if (heroFile && heroFile.size > 0) {
+    const ext = heroFile.name.split(".").pop();
+    const filePath = `${idToUse}/hero-${randomUUID()}.${ext}`;
+    const { error: uploadError } = await supabase.storage.from("solutions").upload(filePath, heroFile, {
+      cacheControl: "3600",
+      contentType: heroFile.type,
+      upsert: true
+    });
+    if (uploadError) return { success: false, message: uploadError.message };
+    heroUrlToUse = getPublicUrl("solutions", filePath);
+  }
+
   const updatePayload: Partial<Database["public"]["Tables"]["solutions"]["Insert"]> = {
     title,
     slug,
     excerpt,
-    hero_url,
+    hero_url: heroUrlToUse,
     problem,
-    solution
+    solution,
+    is_published: true
   };
   if (pdf_url !== undefined) updatePayload.pdf_url = pdf_url;
 
   const { error: updErr } = await supabase.from("solutions").update(updatePayload).eq("id", idToUse);
   if (updErr) return { success: false, message: updErr.message };
 
-  // Chỉ cập nhật liên kết sản phẩm khi form gửi productIds (hiện không dùng)
+  // sync solution_products if provided (legacy)
   if (productIds.length > 0) {
     await supabase.from("solution_products").delete().eq("solution_id", idToUse);
     const links = productIds.map((pid) => {
@@ -89,16 +126,8 @@ export async function upsertSolution(prev: ActionResult | undefined, formData: F
     if (error) return { success: false, message: error.message };
   }
 
-  // Handle combos inline
-  const slugify = (val: string) =>
-    val
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .trim()
-      .replace(/\s+/g, "-");
-
+  // handle combos inline
   if (combosPayload && combosPayload.length >= 0) {
-    // delete removed combos
     const keepIds = combosPayload.filter((c) => c.id).map((c) => c.id!) as string[];
     if (keepIds.length > 0) {
       await supabase.from("solution_combos").delete().eq("solution_id", idToUse).not("id", "in", `(${keepIds.join(",")})`);
@@ -110,10 +139,10 @@ export async function upsertSolution(prev: ActionResult | undefined, formData: F
       if (!combo.name || !combo.items || combo.items.length === 0) continue;
       const name = combo.name.trim();
       const description = combo.description?.toString() || null;
-      const slug = slugify(name);
+      const comboSlug = slugifyText(name);
 
       if (combo.id) {
-        await supabase.from("solution_combos").update({ name, description, slug, is_active: true }).eq("id", combo.id);
+        await supabase.from("solution_combos").update({ name, description, slug: comboSlug, is_active: true }).eq("id", combo.id);
         await supabase.from("combo_items").delete().eq("combo_id", combo.id);
         const items = combo.items
           .filter((i) => i.quantity > 0)
@@ -124,7 +153,7 @@ export async function upsertSolution(prev: ActionResult | undefined, formData: F
       } else {
         const { data: comboInsert } = await supabase
           .from("solution_combos")
-          .insert({ solution_id: idToUse, name, description, slug, is_active: true })
+          .insert({ solution_id: idToUse, name, description, slug: comboSlug, is_active: true })
           .select("id")
           .single();
         if (comboInsert?.id) {
@@ -167,7 +196,8 @@ export async function upsertProduct(prev: ActionResult | undefined, formData: Fo
 
   const productId = formData.get("product_id")?.toString() || null;
   const name = formData.get("name")?.toString().trim() || "";
-  const slug = formData.get("slug")?.toString().trim() || "";
+  const slugInput = formData.get("slug")?.toString().trim() || "";
+  const slug = slugInput || slugifyText(name);
   const unit = formData.get("unit")?.toString().trim() || "";
   const price = formData.get("price") ? Number(formData.get("price")) : null;
   const description = formData.get("description")?.toString().trim() || null;
@@ -176,13 +206,22 @@ export async function upsertProduct(prev: ActionResult | undefined, formData: Fo
   const primaryImageId = formData.get("primaryImage")?.toString() || null;
   const uploadFiles = formData.getAll("images").filter((file) => file instanceof File && file.size > 0) as File[];
 
-  if (!name || !slug) return { success: false, message: "Thiếu thông tin bắt buộc" };
+  if (!name) return { success: false, message: "Thiếu thông tin bắt buộc" };
+
+  // slug uniqueness
+  if (!productId) {
+    const { data: existing } = await supabase.from("products").select("id").eq("slug", slug).maybeSingle();
+    if (existing) return { success: false, message: "Slug đã tồn tại, chọn tên khác" };
+  } else {
+    const { data: existing } = await supabase.from("products").select("id").eq("slug", slug).neq("id", productId);
+    if (existing && existing.length > 0) return { success: false, message: "Slug đã tồn tại, chọn tên khác" };
+  }
 
   let idToUse = productId;
   if (productId) {
     const { error } = await supabase
       .from("products")
-      .update({ name, slug, unit, price, description, excerpt })
+      .update({ name, slug, unit, price, description, excerpt, is_published: true })
       .eq("id", productId);
     if (error) return { success: false, message: error.message };
   } else {
@@ -195,8 +234,9 @@ export async function upsertProduct(prev: ActionResult | undefined, formData: Fo
     idToUse = data.id;
   }
 
-  if (!idToUse) return { success: false, message: "Missing product id" };
+  if (!idToUse) return { success: false, message: "Thiếu product id" };
 
+  // link solutions
   await supabase.from("solution_products").delete().eq("product_id", idToUse);
   if (solutionIds.length > 0) {
     const links = solutionIds.map((sid) => ({ solution_id: sid, product_id: idToUse! }));
@@ -284,6 +324,7 @@ export async function deleteProduct(prev: ActionResult | undefined, formData: Fo
   redirect("/admin/products");
 }
 
+// Legacy combo actions (kept for compatibility, though combos now managed inside solution form)
 export async function upsertCombo(prev: ActionResult | undefined, formData: FormData): Promise<ActionResult> {
   const supabase = getServiceSupabase();
   const comboId = formData.get("combo_id")?.toString() || null;
@@ -292,13 +333,9 @@ export async function upsertCombo(prev: ActionResult | undefined, formData: Form
   const slugInput = formData.get("slug")?.toString().trim() || "";
   const description = formData.get("description")?.toString().trim() || null;
   const price = formData.get("price") ? Number(formData.get("price")) : null;
-  const is_active = true; // luôn bật, combos đơn giản cho admin
+  const is_active = true;
 
-  const slug = slugInput || name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
+  const slug = slugInput || slugifyText(name);
 
   if (!solution_id || !name) return { success: false, message: "Thiếu thông tin combo" };
 
@@ -319,7 +356,6 @@ export async function upsertCombo(prev: ActionResult | undefined, formData: Form
     comboIdToUse = data.id;
   }
 
-  // Combo items from quantities prefix combo_qty_
   if (!comboIdToUse) return { success: false, message: "Thiếu combo id" };
   await supabase.from("combo_items").delete().eq("combo_id", comboIdToUse);
   const items: { combo_id: string; product_id: string; quantity: number }[] = [];
@@ -337,7 +373,6 @@ export async function upsertCombo(prev: ActionResult | undefined, formData: Form
     if (error) return { success: false, message: error.message };
   }
 
-  // Đồng bộ solution_products = tập sản phẩm thuộc các combo của giải pháp (để public site dùng)
   const { data: comboProducts, error: comboItemsErr } = await supabase
     .from("solution_combos")
     .select("combo_items(product_id, quantity)")

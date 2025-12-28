@@ -41,7 +41,7 @@ export function ProductCard({ product }: Props) {
         <p className="text-lg font-semibold text-slate-900">{formatCurrency(product.price)}</p>
         <div className="mt-auto flex items-center justify-between">
           <Button variant="primary" size="sm" asChild className="flex-1">
-            <Link href={`/san-pham/${product.slug}`}>Xem chi tiết</Link>
+            <Link href={`/san-pham/${product.slug}`}>Chi tiết</Link>
           </Button>
           <div className="pl-3">
             <AddToCartButton

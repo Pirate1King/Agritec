@@ -1,0 +1,48 @@
+import Link from "next/link";
+
+export function Footer() {
+  return (
+    <footer className="border-t border-surface-border bg-surface-light mt-16">
+      <div className="container grid gap-10 py-12 md:grid-cols-4">
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-brand-blue">AGRITEC</p>
+          <p className="text-sm text-slate-600">
+            Gi?i pháp nông nghi?p s? cho trang tr?i và nhà phân ph?i. Thi?t k? t?i Vi?t Nam, tiêu chu?n qu?c t?.
+          </p>
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-slate-800">Gi?i pháp</h4>
+          <div className="mt-3 space-y-2 text-sm text-slate-600">
+            <Link href="/giai-phap/tuoi-nho-giot-thong-minh">Tu?i nh? gi?t thông minh</Link>
+            <Link href="/giai-phap/giam-sat-vi-khi-hau">Giám sát vi khí h?u</Link>
+            <Link href="/giai-phap/dinh-duong-chinh-xac">Dinh du?ng chính xác</Link>
+          </div>
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-slate-800">H? tr?</h4>
+          <div className="mt-3 space-y-2 text-sm text-slate-600">
+            <Link href="/dat-hang">Ð?t hàng</Link>
+            <Link href="https://zalo.me/0977791412" target="_blank">
+              Tu v?n Zalo
+            </Link>
+            <Link href="mailto:hello@agritec.vn">hello@agritec.vn</Link>
+          </div>
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-slate-800">Ð?a ch?</h4>
+          <p className="mt-3 text-sm text-slate-600">
+            <div className="space-y-1"><p>MST: 3703096325</p><p>Công ty TNHH Thuong M?i D?ch V? Agritec</p><p>Ð?a ch? thu?: 61/6 Ðông Tác, Khu ph? Ðông Tác, P. Di An, TP. H? Chí Minh</p><p>Ð?a ch?: 61/6 Ðông Tác, Khu ph? Ðông Tác, P. Tân Ðông Hi?p, TP. Di An, Bình Duong</p><p>Ð?i di?n: Nguy?n Ti?n Hùng</p><p>Ði?n tho?i: 0846 411 968</p></div>
+          </p>
+        </div>
+      </div>
+      <div className="border-t border-surface-border py-6">
+        <div className="container flex flex-col gap-2 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+          <p>© {new Date().getFullYear()} Agritec. All rights reserved.</p>
+          <p>Made for trang tr?i, dealers, distributors.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+

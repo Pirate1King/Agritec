@@ -8,33 +8,94 @@ import Link from "next/link";
 
 export default async function HomePage() {
   const [solutions, products] = await Promise.all([getSolutions(), getProducts()]);
-
   const featuredProducts = products.slice(0, 3);
 
-  const processSteps = [
-    { title: "Khảo sát nhanh", detail: "Phân tích hệ thống tưới, điện, nguồn nước và hiện trạng vận hành." },
-    { title: "Thiết kế giải pháp", detail: "Đề xuất cấu hình thiết bị, lưu đồ vận hành, chi phí và ROI dự kiến." },
-    { title: "Triển khai & kiểm thử", detail: "Lắp đặt, hiệu chỉnh áp lực, tích hợp cảm biến và dashboard." },
-    { title: "Đào tạo & vận hành", detail: "Bàn giao quy trình, hướng dẫn kỹ thuật, hỗ trợ 24/7 qua Zalo." }
+  const heGiaiPhap = [
+    {
+      title: "Kiểm soát tiêu chảy không đặc hiệu",
+      points: [
+        "Áp dụng cho tiêu chảy do vi khuẩn, virus, độc tố, nấm mốc, rong tảo, stress",
+        "Không phụ thuộc nguyên nhân cụ thể",
+        "Giải pháp sinh học thay thế kháng sinh",
+        "Phù hợp mọi giai đoạn nuôi"
+      ]
+    },
+    {
+      title: "Hỗ trợ tiêu hoá & đường ruột",
+      points: [
+        "Cân bằng hệ vi sinh đường ruột",
+        "Giảm phân lỏng, phân không định hình",
+        "Tăng hấp thu dinh dưỡng",
+        "Giúp đàn ổn định và đồng đều hơn"
+      ]
+    },
+    {
+      title: "Giảm kháng sinh theo định hướng EU",
+      points: [
+        "Không dùng kháng sinh tăng trưởng",
+        "Phù hợp xu hướng chăn nuôi Farm to Fork, One Health",
+        "Giảm nguy cơ kháng kháng sinh",
+        "Hướng đến chăn nuôi an toàn, bền vững"
+      ]
+    },
+    {
+      title: "An toàn sinh học & môi trường chăn nuôi",
+      points: [
+        "Sát trùng chuồng trại, thiết bị, phương tiện",
+        "Giảm mầm bệnh tồn lưu trong môi trường",
+        "Giảm mùi hôi, ẩm chuồng",
+        "Hạn chế tái nhiễm chéo trong đàn"
+      ]
+    }
+  ];
+
+  const moHinh = [
+    {
+      title: "Bước 01 – Xác định vấn đề & mục tiêu",
+      points: [
+        "Tiêu chảy kéo dài",
+        "Đàn kém đồng đều",
+        "Phụ thuộc kháng sinh",
+        "Môi trường trại mất an toàn sinh học"
+      ]
+    },
+    {
+      title: "Bước 02 – Chọn nhóm giải pháp phù hợp",
+      points: ["Acid hữu cơ", "Butyrate", "Tannin", "Sát trùng môi trường", "Có thể dùng đơn lẻ hoặc kết hợp combo"]
+    },
+    {
+      title: "Bước 03 – Xây dựng phác đồ sử dụng",
+      points: ["Pha vào nước uống", "Trộn vào thức ăn", "Phun sát trùng chuồng trại", "Áp dụng theo từng giai đoạn nuôi"]
+    },
+    {
+      title: "Bước 04 – Theo dõi & điều chỉnh",
+      points: [
+        "Điều chỉnh liều lượng và thời điểm",
+        "Thay đổi combo khi điều kiện trại thay đổi",
+        "Hỗ trợ kỹ thuật trong suốt quá trình sử dụng"
+      ]
+    }
   ];
 
   return (
     <div className="space-y-20">
       <div className="container">
+        
         <Hero
-          title="Nền tảng giải pháp nông nghiệp dành cho doanh nghiệp"
-          subtitle="Agritec thiết kế và triển khai hệ thống tưới, giám sát vi khí hậu và dinh dưỡng chính xác cho trang trại và nhà phân phối."
-          videoUrl="https://cdn.coverr.co/videos/coverr-green-leaves-1543/1080p.mp4"
+          title="Giải pháp vận hành trang trại chăn nuôi B2B"
+          subtitle="Mỗi giải pháp là một hệ triển khai hoàn chỉnh: sản phẩm – quy trình – thiết bị – combo ứng dụng thực tế."
+          imageUrl="https://www.spireenergy.com/sites/default/files/styles/hero_image/public/2020-03/rsz_gettyimages-177750786.jpg?itok=zyV3xtCw"
           primaryCta={{ label: "Xem giải pháp", href: "/giai-phap" }}
           secondaryCta={{ label: "Đặt hàng", href: "/dat-hang" }}
         />
+
       </div>
 
       <section className="container" id="solutions">
         <SectionHeader
           eyebrow="Solutions"
-          title="Giải pháp cốt lõi của Agritec"
-          description="Thiết kế để giải quyết các vấn đề vận hành thực tế: thiếu nhân công, dữ liệu rời rạc, chi phí nước điện tăng cao."
+          title="Giải pháp trọng tâm của Agritec"
+          description="Tưới nhỏ giọt, giám sát vi khí hậu, sát trùng đường nước, kiểm soát tiêu chảy và dinh dưỡng chính xác."
         />
         <div className="mt-10 grid gap-8 md:grid-cols-2">
           {solutions.map((solution) => (
@@ -43,34 +104,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="container" id="why">
-        <div className="rounded-[32px] border border-surface-border bg-surface-light px-8 py-12 shadow-soft">
-          <SectionHeader
-            eyebrow="Why Agritec"
-            title="Thiết kế cho vận hành doanh nghiệp"
-            description="Được sử dụng bởi các trang trại quy mô 5-200ha và nhà phân phối khu vực."
-          />
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {[
-              { title: "Chuẩn B2B", desc: "Hợp đồng rõ ràng, SLA hỗ trợ, dashboard cho nhiều nông trường." },
-              { title: "Tích hợp IoT", desc: "Kết nối cảm biến, camera, bộ điều khiển tưới trong một nền tảng." },
-              { title: "Hạ tầng Supabase", desc: "Bảo mật, lưu trữ hình ảnh, realtime, sẵn sàng mở rộng." }
-            ].map((item) => (
-              <div key={item.title} className="rounded-2xl bg-white p-6 shadow-soft">
-                <p className="text-sm font-semibold text-brand-orange">Trust</p>
-                <h3 className="mt-2 font-heading text-xl text-brand-blue">{item.title}</h3>
-                <p className="mt-2 text-slate-600">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="container">
         <SectionHeader
           eyebrow="Sản phẩm nổi bật"
-          title="Thiết bị và vật tư sẵn sàng giao ngay"
-          description="Đồng bộ với giải pháp Agritec, có thể đặt riêng lẻ hoặc theo combo giải pháp."
+          title="Thiết bị, hóa chất, phụ gia đã kiểm chứng"
+          description="Acidex/Globacid sát trùng đường nước, Mixtron pha trộn, cảm biến & điều khiển tưới; đặt lẻ hoặc theo combo."
         />
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {featuredProducts.map((product) => (
@@ -92,26 +130,57 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="container" id="process">
-        <div className="rounded-[28px] border border-surface-border bg-white px-8 py-12 shadow-soft">
-          <SectionHeader
-            eyebrow="Process"
-            title="Quy trình triển khai 4 bước"
-            description="Thiết kế lean, rõ ràng, ưu tiên thời gian đưa vào vận hành."
-          />
-          <div className="mt-10 grid gap-6 md:grid-cols-4">
-            {processSteps.map((step, index) => (
-              <div
-                key={step.title}
-                className="flex flex-col gap-3 rounded-2xl border border-surface-border bg-surface-light p-5 transition hover:-translate-y-1 hover:shadow-soft"
-                style={{ transitionDuration: "250ms" }}
-              >
-                <span className="text-sm font-semibold text-brand-orange">0{index + 1}</span>
-                <h4 className="font-heading text-lg text-brand-blue">{step.title}</h4>
-                <p className="text-sm text-slate-600">{step.detail}</p>
-              </div>
-            ))}
-          </div>
+      <section className="container" id="he-giai-phap">
+        <SectionHeader
+          eyebrow="Hệ giải pháp"
+          title="Hệ giải pháp chăn nuôi Agritec"
+          description="Agritec triển khai nhiều nhóm giải pháp sinh học cho chăn nuôi, sử dụng riêng lẻ hoặc kết hợp thành combo để giải quyết các vấn đề thực tế trong trang trại."
+        />
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {heGiaiPhap.map((item) => (
+            <div
+              key={item.title}
+              className="h-full rounded-2xl border border-surface-border bg-gradient-to-br from-white to-surface-light p-5 shadow-soft transition hover:-translate-y-1 hover:border-brand-blue"
+            >
+              <div className="mb-3 h-1 w-12 rounded-full bg-brand-orange" />
+              <h4 className="font-heading text-lg text-brand-blue">{item.title}</h4>
+              <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                {item.points.map((p) => (
+                  <li key={p} className="flex gap-2">
+                    <span className="text-brand-orange">•</span>
+                    <span>{p}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="container" id="mo-hinh-trien-khai">
+        <SectionHeader
+          eyebrow="Mô hình triển khai"
+          title="Mô hình triển khai giải pháp tại trang trại"
+          description="Agritec không bán sản phẩm rời mà xây dựng phác đồ sử dụng giải pháp dựa trên mục tiêu và tình trạng thực tế của từng trang trại."
+        />
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {moHinh.map((item) => (
+            <div
+              key={item.title}
+              className="h-full rounded-2xl border border-surface-border bg-gradient-to-br from-white to-surface-light p-5 shadow-soft transition hover:-translate-y-1 hover:border-brand-blue"
+            >
+              <div className="mb-3 h-1 w-12 rounded-full bg-brand-orange" />
+              <h4 className="font-heading text-lg text-brand-blue">{item.title}</h4>
+              <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                {item.points.map((p) => (
+                  <li key={p} className="flex gap-2">
+                    <span className="text-brand-orange">•</span>
+                    <span>{p}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -119,9 +188,9 @@ export default async function HomePage() {
         <div className="flex flex-col items-start justify-between gap-6 rounded-[24px] border border-brand-blue bg-brand-blue px-8 py-10 text-white shadow-soft md:flex-row md:items-center">
           <div className="space-y-3">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-orange">Ready to deploy</p>
-            <h3 className="font-heading text-3xl font-semibold">Triển khai giải pháp Agritec cho vụ mùa tiếp theo</h3>
+            <h3 className="font-heading text-3xl font-semibold">Sẵn sàng triển khai giải pháp cho trang trại của bạn</h3>
             <p className="text-slate-100">
-              Đặt lịch tư vấn hoặc chọn ngay combo phù hợp. Đội ngũ kỹ thuật sẽ chuẩn bị cấu hình và báo giá trong 24h.
+              Đăng ký tư vấn để Agritec đánh giá mô hình, đề xuất giải pháp và cấu hình combo phù hợp.
             </p>
           </div>
           <div className="flex gap-3">
@@ -129,7 +198,7 @@ export default async function HomePage() {
               <Link href="/dat-hang">Đặt hàng</Link>
             </Button>
             <Button variant="secondary" size="lg" asChild>
-              <Link href="https://zalo.me" target="_blank">
+              <Link href="https://zalo.me/0977791412" target="_blank">
                 Tư vấn Zalo
               </Link>
             </Button>

@@ -11,15 +11,13 @@ export const getServerSupabaseClient = (): SupabaseClient<Database> | null => {
   }
 
   const cookieStore = cookies();
-  return createServerClient<Database>(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        }
-      }
+  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll().map(({ name, value }) => ({ name, value }));
+      },
+      // In Server Components we should not set cookies; auth checks only need read access
+      setAll() {}
     }
-  );
+  });
 };

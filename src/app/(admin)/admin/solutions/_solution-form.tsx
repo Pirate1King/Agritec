@@ -15,7 +15,6 @@ type SolutionFormProps = {
     pdf_url: string | null;
     problem: string | null;
     solution: string | null;
-    solution_products?: { product_id: string; quantity?: number }[];
     solution_combos?: {
       id: string;
       name: string;
@@ -42,13 +41,7 @@ type ComboDraft = {
   items: { product_id: string; quantity: number }[];
 };
 
-function CombosBuilder({
-  initialCombos,
-  products
-}: {
-  initialCombos: ComboDraft[];
-  products: { id: string; name: string }[];
-}) {
+function CombosBuilder({ initialCombos, products }: { initialCombos: ComboDraft[]; products: { id: string; name: string }[] }) {
   const [combos, setCombos] = useState<ComboDraft[]>(initialCombos);
 
   const updateCombo = (idx: number, updater: (c: ComboDraft) => ComboDraft) => {
@@ -74,9 +67,7 @@ function CombosBuilder({
 
   const changeQty = (idx: number, product_id: string, qty: number) => {
     updateCombo(idx, (combo) => {
-      const nextItems = combo.items.map((i) =>
-        i.product_id === product_id ? { ...i, quantity: qty > 0 ? qty : 1 } : i
-      );
+      const nextItems = combo.items.map((i) => (i.product_id === product_id ? { ...i, quantity: qty > 0 ? qty : 1 } : i));
       return { ...combo, items: nextItems };
     });
   };
@@ -88,17 +79,12 @@ function CombosBuilder({
           <p className="text-xs uppercase tracking-[0.2em] text-brand-orange">Combos</p>
           <h3 className="font-heading text-lg text-brand-blue">Nhóm sản phẩm cho giải pháp</h3>
         </div>
-        <Button
-          type="button"
-          variant="accent"
-          size="sm"
-          onClick={() => setCombos((prev) => [...prev, { name: "", description: "", items: [] }])}
-        >
+        <Button type="button" variant="accent" size="sm" onClick={() => setCombos((prev) => [...prev, { name: "", description: "", items: [] }])}>
           Thêm combo
         </Button>
       </div>
 
-      {combos.length === 0 && <p className="text-sm text-slate-600">Chưa có combo. Bấm “Thêm combo”.</p>}
+      {combos.length === 0 && <p className="text-sm text-slate-600">Chưa có combo. Bấm Thêm combo để bắt đầu.</p>}
 
       <div className="space-y-3">
         {combos.map((combo, idx) => (
@@ -137,12 +123,7 @@ function CombosBuilder({
                 return (
                   <div key={p.id} className="flex items-center justify-between rounded-xl border border-surface-border bg-white px-3 py-2">
                     <label className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4"
-                        checked={checked}
-                        onChange={(e) => toggleProduct(idx, p.id, e.target.checked)}
-                      />
+                      <input type="checkbox" className="h-4 w-4" checked={checked} onChange={(e) => toggleProduct(idx, p.id, e.target.checked)} />
                       <span className="text-sm text-slate-800">{p.name}</span>
                     </label>
                     <div className="flex items-center gap-2">
@@ -180,32 +161,19 @@ export function SolutionForm({ solution, products }: SolutionFormProps) {
   const [state, formAction] = useFormState(upsertSolution, { success: false, message: "" });
 
   return (
-    <form
-      action={formAction}
-      className="space-y-6 rounded-2xl border border-surface-border bg-surface-light p-6"
-      encType="multipart/form-data"
-    >
+    <form action={formAction} className="space-y-6 rounded-2xl border border-surface-border bg-surface-light p-6" encType="multipart/form-data">
       <input type="hidden" name="solution_id" value={solution?.id || ""} />
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <label className="text-sm font-semibold text-slate-800">Tiêu đề</label>
-          <input
-            name="title"
-            defaultValue={solution?.title}
-            className="mt-2 w-full rounded-xl border border-surface-border px-3 py-2"
-            required
-          />
-        </div>
-        <div>
-          <label className="text-sm font-semibold text-slate-800">Slug</label>
-          <input
-            name="slug"
-            defaultValue={solution?.slug}
-            className="mt-2 w-full rounded-xl border border-surface-border px-3 py-2"
-            required
-          />
-        </div>
+      <div>
+        <label className="text-sm font-semibold text-slate-800">Tiêu đề</label>
+        <input
+          name="title"
+          defaultValue={solution?.title}
+          className="mt-2 w-full rounded-xl border border-surface-border px-3 py-2"
+          placeholder="Tên giải pháp"
+          required
+        />
+        <p className="mt-1 text-xs text-slate-500">Slug sẽ tự tạo từ tiêu đề và kiểm tra trùng.</p>
       </div>
 
       <div>
@@ -222,41 +190,32 @@ export function SolutionForm({ solution, products }: SolutionFormProps) {
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="text-sm font-semibold text-slate-800">Problem</label>
-          <textarea
-            name="problem"
-            defaultValue={solution?.problem || ""}
-            className="mt-2 w-full rounded-xl border border-surface-border px-3 py-3"
-          />
+          <textarea name="problem" defaultValue={solution?.problem || ""} className="mt-2 w-full rounded-xl border border-surface-border px-3 py-3" />
         </div>
         <div>
           <label className="text-sm font-semibold text-slate-800">Solution</label>
-          <textarea
-            name="solution"
-            defaultValue={solution?.solution || ""}
-            className="mt-2 w-full rounded-xl border border-surface-border px-3 py-3"
-          />
+          <textarea name="solution" defaultValue={solution?.solution || ""} className="mt-2 w-full rounded-xl border border-surface-border px-3 py-3" />
         </div>
       </div>
 
       <div>
-        <label className="text-sm font-semibold text-slate-800">Hero image/video URL</label>
-        <input
-          name="hero_url"
-          defaultValue={solution?.hero_url || ""}
-          className="mt-2 w-full rounded-xl border border-surface-border px-3 py-2"
-        />
+        <label className="text-sm font-semibold text-slate-800">Ảnh hero</label>
+        <div className="mt-2 space-y-2">
+          <input name="hero_url" defaultValue={solution?.hero_url || ""} placeholder="Dán URL ảnh (tuỳ chọn)" className="w-full rounded-xl border border-surface-border px-3 py-2" />
+          <input type="file" name="hero_upload" accept="image/*" className="text-sm" />
+          {solution?.hero_url && (
+            <a href={solution.hero_url} target="_blank" rel="noreferrer" className="text-sm font-semibold text-brand-blue hover:underline">
+              Xem ảnh hiện tại
+            </a>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">
         <label className="text-sm font-semibold text-slate-800">Brochure / PDF</label>
         <input type="file" name="pdf" accept="application/pdf" className="text-sm" />
         {solution?.pdf_url && (
-          <a
-            href={solution.pdf_url}
-            target="_blank"
-            className="text-sm font-semibold text-brand-blue hover:underline"
-            rel="noreferrer"
-          >
+          <a href={solution.pdf_url} target="_blank" className="text-sm font-semibold text-brand-blue hover:underline" rel="noreferrer">
             Xem file hiện tại
           </a>
         )}
@@ -265,11 +224,7 @@ export function SolutionForm({ solution, products }: SolutionFormProps) {
       <CombosBuilder initialCombos={initialCombos} products={products} />
 
       {state.message && (
-        <div
-          className={`rounded-xl px-3 py-2 text-sm ${
-            state.success ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
-          }`}
-        >
+        <div className={`rounded-xl px-3 py-2 text-sm ${state.success ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
           {state.message}
         </div>
       )}

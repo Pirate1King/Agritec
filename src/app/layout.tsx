@@ -3,19 +3,19 @@ import { Inter, Sora, Manrope } from "next/font/google";
 import "@/app/globals.css";
 
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext", "vietnamese"],
   variable: "--font-inter",
   display: "swap"
 });
 
 const sora = Sora({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-sora",
   display: "swap"
 });
 
 const manrope = Manrope({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-manrope",
   display: "swap"
 });

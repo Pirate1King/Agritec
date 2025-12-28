@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import Link from "next/link";
@@ -8,17 +9,19 @@ import CartButton from "../nav/cart-button";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { Menu, X } from "lucide-react";
 
 const navLinks = [
   { href: "/giai-phap", label: "Giải pháp" },
   { href: "/san-pham", label: "Sản phẩm" },
-  { href: "/#why", label: "Tại sao Agritec" },
-  { href: "/#process", label: "Quy trình" }
+  { href: "/#he-giai-phap", label: "Hệ giải pháp" },
+  { href: "/#mo-hinh-trien-khai", label: "Mô hình triển khai" }
 ];
 
 export function Navbar() {
   const pathname = usePathname();
   const [hash, setHash] = useState<string>("");
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const setFromLocation = () => setHash(window.location.hash);
@@ -31,6 +34,7 @@ export function Navbar() {
     if (typeof window !== "undefined") {
       setHash(window.location.hash);
     }
+    setOpen(false);
   }, [pathname]);
 
   const isActive = (href: string) => {
@@ -46,6 +50,7 @@ export function Navbar() {
     if (href.startsWith("/#")) {
       setHash(href.replace("/", ""));
     }
+    setOpen(false);
   };
 
   return (
@@ -53,11 +58,12 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
           <Image src="/logo.png" alt="Agritec" width={36} height={36} className="rounded-lg" />
-          <div>
-            <p className="font-heading text-lg text-brand-blue leading-tight">AGRITEC</p>
+          <div className="leading-tight">
+            <p className="font-heading text-lg text-brand-blue">AGRITEC</p>
             <p className="text-[12px] uppercase tracking-[0.2em] text-slate-500">Agriculture Solutions</p>
           </div>
         </Link>
+
         <nav className="hidden items-center gap-2 text-sm font-semibold text-slate-700 md:flex">
           {navLinks.map((link) => {
             const active = isActive(link.href);
@@ -76,10 +82,11 @@ export function Navbar() {
             );
           })}
         </nav>
+
         <div className="hidden items-center gap-3 md:flex">
           <CartButton />
           <Button variant="ghost" size="sm" asChild>
-            <Link href="https://zalo.me" target="_blank">
+            <Link href="https://zalo.me/0977791412" target="_blank">
               Tư vấn Zalo
             </Link>
           </Button>
@@ -89,7 +96,49 @@ export function Navbar() {
             </Button>
           </motion.div>
         </div>
+
+        <div className="flex items-center gap-3 md:hidden">
+          <CartButton />
+          <Button variant="ghost" size="sm" onClick={() => setOpen((v) => !v)} aria-label="Toggle menu">
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
+
+      {open && (
+        <div className="border-t border-surface-border bg-white md:hidden">
+          <div className="container space-y-3 py-4">
+            <nav className="flex flex-col gap-2 text-sm font-semibold text-slate-700">
+              {navLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => handleAnchorClick(link.href)}
+                    className={cn(
+                      "rounded-xl px-3 py-2 transition",
+                      active ? "bg-surface-light text-brand-blue" : "hover:bg-surface-light"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </nav>
+            <div className="flex flex-col gap-2">
+              <Button variant="accent" size="lg" asChild className="w-full justify-center">
+                <Link href="/dat-hang">Đặt hàng</Link>
+              </Button>
+              <Button variant="secondary" size="lg" asChild className="w-full justify-center">
+                <Link href="https://zalo.me/0977791412" target="_blank">
+                  Tư vấn Zalo
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
