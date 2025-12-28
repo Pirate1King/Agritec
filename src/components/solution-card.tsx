@@ -2,16 +2,39 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { ShoppingCart } from "lucide-react";
 
 import { Solution } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useCartStore } from "@/store/cart-store";
 
 type Props = {
   solution: Solution;
 };
 
 export function SolutionCard({ solution }: Props) {
+  const { addItem, open } = useCartStore();
+
+  const handleAddCombos = () => {
+    if (!solution.combos || solution.combos.length === 0) return;
+    solution.combos.forEach((combo) => {
+      const fallbackImage =
+        combo.items?.find((i) => i.product?.images && i.product.images.length > 0)?.product?.images?.[0]?.url ||
+        solution.hero_url ||
+        null;
+      addItem({
+        productId: `combo-${combo.id}`,
+        name: combo.name,
+        quantity: 1,
+        price: combo.price ?? null,
+        unit: "combo",
+        image: fallbackImage
+      });
+    });
+    open();
+  };
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 24 }}
@@ -40,8 +63,16 @@ export function SolutionCard({ solution }: Props) {
           <Button variant="primary" size="sm" asChild>
             <Link href={`/giai-phap/${solution.slug}`}>Chi tiết</Link>
           </Button>
-          <Button variant="secondary" size="sm" asChild>
-            <Link href={`/giai-phap/${solution.slug}#combo`}>Xem combo</Link>
+          <Button
+            variant="secondary"
+            size="sm"
+            type="button"
+            onClick={handleAddCombos}
+            disabled={!solution.combos || solution.combos.length === 0}
+            className="gap-2"
+          >
+            <ShoppingCart className="h-4 w-4" aria-hidden />
+            Thêm combo
           </Button>
         </div>
       </div>
