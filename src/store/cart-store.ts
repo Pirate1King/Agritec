@@ -16,10 +16,15 @@ type CartState = {
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
   clear: () => void;
+  isOpen: boolean;
+  open: () => void;
+  close: () => void;
+  toggle: () => void;
 };
 
 export const useCartStore = create<CartState>((set) => ({
   items: [],
+  isOpen: false,
   setItems: (items) => set({ items }),
   addItem: (item) =>
     set((state) => {
@@ -38,5 +43,8 @@ export const useCartStore = create<CartState>((set) => ({
       items: state.items.map((item) => (item.productId === productId ? { ...item, quantity } : item))
     })),
   removeItem: (productId) => set((state) => ({ items: state.items.filter((item) => item.productId !== productId) })),
-  clear: () => set({ items: [] })
+  clear: () => set({ items: [] }),
+  open: () => set({ isOpen: true }),
+  close: () => set({ isOpen: false }),
+  toggle: () => set((state) => ({ isOpen: !state.isOpen }))
 }));

@@ -1,15 +1,19 @@
 'use client';
 
-import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
 
 export default function CartButton() {
-  const { items } = useCartStore();
+  const { items, toggle } = useCartStore();
   const count = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
-    <Link href="/dat-hang" className="relative inline-flex items-center rounded-full px-3 py-2 text-slate-700 hover:bg-surface-light">
+    <button
+      type="button"
+      onClick={toggle}
+      className="relative inline-flex items-center rounded-full px-3 py-2 text-slate-700 hover:bg-surface-light"
+      aria-label="Mở giỏ hàng"
+    >
       <div className="relative">
         <ShoppingCart className="h-5 w-5 text-brand-blue" />
         {count > 0 && (
@@ -18,6 +22,6 @@ export default function CartButton() {
           </span>
         )}
       </div>
-    </Link>
+    </button>
   );
 }

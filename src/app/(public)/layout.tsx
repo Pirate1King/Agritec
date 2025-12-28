@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { CartDrawer } from "@/components/cart-drawer";
 
 // Revalidate public pages periodically to improve first-byte speed while keeping content relatively fresh
 export const revalidate = 180;
@@ -10,6 +11,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <Navbar />
       <main className="pt-24">{children}</main>
       <Footer />
+      <CartDrawer />
     </div>
   );
 }

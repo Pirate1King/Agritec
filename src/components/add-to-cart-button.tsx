@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from "react";
+import { Check, ShoppingCart } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { useCartStore, type CartItem } from "@/store/cart-store";
-import { useState } from "react";
 
 type Props = {
   item: CartItem;
@@ -12,19 +14,26 @@ type Props = {
   className?: string;
 };
 
-export function AddToCartButton({ item, label = "Thêm vào giỏ", size = "sm", variant = "accent", className }: Props) {
-  const { addItem } = useCartStore();
+export function AddToCartButton({
+  item,
+  label = <ShoppingCart className="h-4 w-4" aria-hidden />,
+  size = "sm",
+  variant = "accent",
+  className
+}: Props) {
+  const { addItem, open } = useCartStore();
   const [added, setAdded] = useState(false);
 
   const handleAdd = () => {
     addItem(item);
+    open();
     setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    setTimeout(() => setAdded(false), 800);
   };
 
   return (
     <Button onClick={handleAdd} size={size} variant={variant} type="button" className={className}>
-      {added ? "Đã thêm" : label}
+      {added ? <Check className="h-4 w-4" aria-hidden /> : label}
     </Button>
   );
 }
