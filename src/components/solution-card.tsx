@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { Solution } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AddToCartButton } from "@/components/add-to-cart-button";
 
 type Props = {
   solution: Solution;
@@ -41,17 +40,9 @@ export function SolutionCard({ solution }: Props) {
           <Button variant="primary" size="sm" asChild>
             <Link href={`/giai-phap/${solution.slug}`}>Chi tiết</Link>
           </Button>
-          <AddToCartButton
-            variant="secondary"
-            item={{
-              productId: `solution-${solution.id}`,
-              name: solution.title,
-              quantity: 1,
-              price: null,
-              unit: null,
-              image: solution.hero_url || undefined
-            }}
-          />
+          <Button variant="secondary" size="sm" asChild>
+            <Link href={`/giai-phap/${solution.slug}#combo`}>Xem combo</Link>
+          </Button>
         </div>
       </div>
     </motion.article>
