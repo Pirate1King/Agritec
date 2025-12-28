@@ -72,17 +72,33 @@ export default function OrderForm({ prefillItems }: Props) {
       return;
     }
     startTransition(async () => {
+      const expandedItems = items.flatMap((item) => {
+        const isCombo = item.productId.startsWith("combo-");
+        if (isCombo && item.children && item.children.length > 0) {
+          return item.children
+            .filter((c) => c.productId)
+            .map((c) => ({
+              product_id: c.productId as string,
+              quantity: (c.quantity || 1) * item.quantity,
+              price: c.price ?? null
+            }));
+        }
+        return [
+          {
+            product_id: item.productId,
+            quantity: item.quantity,
+            price: item.price
+          }
+        ];
+      });
+
       const result = await submitOrder({
         name: form.name,
         phone: form.phone,
         address: form.address,
         note: form.note,
         payment_method: form.payment_method,
-        items: items.map((item) => ({
-          product_id: item.productId,
-          quantity: item.quantity,
-          price: item.price
-        }))
+        items: expandedItems
       });
       setMessage(result.message);
       if (result.success) {

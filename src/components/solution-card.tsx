@@ -28,6 +28,7 @@ export function SolutionCard({ solution }: Props) {
         0;
       const children =
         combo.items?.map((item) => ({
+          productId: item.product?.id,
           name: item.product?.name || "Sản phẩm",
           quantity: item.quantity,
           price: item.product?.price ?? null
