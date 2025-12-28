@@ -61,11 +61,15 @@ export default async function HomePage() {
     },
     {
       title: "Bước 03 · Xây dựng phác đồ sử dụng",
-      points: ["Pha vào nước uống", "Trộn vào thức ăn", "Phun sát trùng chuồng trại", "Áp dụng theo từng giai đoạn nuôi"]
+      points: ["Pha vào nước uống", "Trộn vào thức ăn", "Phun sát trùng chuồng", "Áp dụng theo từng giai đoạn nuôi"]
     },
     {
       title: "Bước 04 · Theo dõi & điều chỉnh",
-      points: ["Điều chỉnh liều lượng và thời điểm", "Thay đổi combo khi điều kiện trại thay đổi", "Hỗ trợ kỹ thuật xuyên suốt quá trình"]
+      points: [
+        "Điều chỉnh liều lượng và thời điểm",
+        "Thay đổi combo khi điều kiện trại thay đổi",
+        "Hỗ trợ kỹ thuật xuyên suốt quá trình"
+      ]
     }
   ];
 
@@ -77,7 +81,7 @@ export default async function HomePage() {
           subtitle="Mỗi giải pháp là một bộ triển khai hoàn chỉnh: sản phẩm + quy trình + thiết bị + combo ứng dụng thực tế."
           imageUrl="https://www.spireenergy.com/sites/default/files/styles/hero_image/public/2020-03/rsz_gettyimages-177750786.jpg?itok=zyV3xtCw"
           primaryCta={{ label: "Xem giải pháp", href: "/giai-phap" }}
-          secondaryCta={{ label: "Đặt hàng", href: "/dat-hang" }}
+          secondaryCta={{ label: "Sản phẩm", href: "/san-pham" }}
         />
       </div>
 
@@ -157,7 +161,7 @@ export default async function HomePage() {
             </Button>
             <Button variant="secondary" size="lg" asChild>
               <Link href="https://zalo.me/0977791412" target="_blank">
-                Tư vấn Zalo
+                Tư vấn
               </Link>
             </Button>
           </div>

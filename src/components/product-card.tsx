@@ -23,21 +23,27 @@ export function ProductCard({ product }: Props) {
       viewport={{ once: true }}
       className="flex flex-col overflow-hidden rounded-3xl border border-surface-border bg-white shadow-soft"
     >
-      <div className="relative h-48 overflow-hidden bg-surface-light">
-        {primaryImage ? (
-          <img src={primaryImage.url} alt={product.name} className="h-full w-full object-contain" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-surface-light text-slate-500">Ảnh sản phẩm</div>
-        )}
-        <div className="absolute left-4 top-4">
-          <Badge variant="accent">{product.category || "Thiết bị"}</Badge>
+      <Link href={`/san-pham/${product.slug}`} className="group">
+        <div className="relative h-48 overflow-hidden bg-surface-light">
+          {primaryImage ? (
+            <img
+              src={primaryImage.url}
+              alt={product.name}
+              className="h-full w-full object-contain transition group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-surface-light text-slate-500">Đang cập nhật hình</div>
+          )}
+          <div className="absolute left-4 top-4">
+            <Badge variant="accent">{product.category || "Thiết bị"}</Badge>
+          </div>
         </div>
-      </div>
+      </Link>
       <div className="flex flex-1 flex-col gap-3 p-6">
-        <div>
-          <h3 className="font-heading text-xl text-brand-blue">{product.name}</h3>
+        <Link href={`/san-pham/${product.slug}`} className="group">
+          <h3 className="font-heading text-xl text-brand-blue group-hover:text-brand-ink">{product.name}</h3>
           <p className="mt-1 text-slate-600">{product.excerpt}</p>
-        </div>
+        </Link>
         <p className="text-lg font-semibold text-slate-900">{formatCurrency(product.price)}</p>
         <div className="mt-auto flex items-center justify-between">
           <Button variant="primary" size="sm" asChild className="flex-1">

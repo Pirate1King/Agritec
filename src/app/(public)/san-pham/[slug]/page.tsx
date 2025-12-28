@@ -53,7 +53,7 @@ export default async function ProductDetailPage({ params }: Props) {
             <AddToCartButton
               size="lg"
               variant="accent"
-              label=""
+              label={<ShoppingCart className="h-4 w-4" aria-hidden />}
               item={{
                 productId: product.id,
                 name: product.name,
