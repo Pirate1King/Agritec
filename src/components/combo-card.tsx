@@ -32,11 +32,11 @@ export function ComboCard({ combo, solutionSlug }: Props) {
       </div>
       <div className="flex flex-wrap gap-3">
         <Button variant="accent" size="sm" asChild>
-          <Link href={`/dat-hang?combo=${combo.slug}&solution=${solutionSlug}`}>Đặt combo giải pháp này</Link>
+          <Link href={`/dat-hang?combo=${combo.slug}&solution=${solutionSlug}`}>Đặt combo</Link>
         </Button>
         <Button variant="ghost" size="sm" asChild>
           <Link href="https://zalo.me/0977791412" target="_blank">
-            Tư vấn Zalo
+            Tư vấn
           </Link>
         </Button>
       </div>

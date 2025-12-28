@@ -87,7 +87,7 @@ export function Navbar() {
           <CartButton />
           <Button variant="ghost" size="sm" asChild>
             <Link href="https://zalo.me/0977791412" target="_blank">
-              Tư vấn Zalo
+              Tư vấn
             </Link>
           </Button>
           <motion.div whileHover={{ y: -1 }}>
@@ -132,7 +132,7 @@ export function Navbar() {
               </Button>
               <Button variant="secondary" size="lg" asChild className="w-full justify-center">
                 <Link href="https://zalo.me/0977791412" target="_blank">
-                  Tư vấn Zalo
+                  Tư vấn
                 </Link>
               </Button>
             </div>
