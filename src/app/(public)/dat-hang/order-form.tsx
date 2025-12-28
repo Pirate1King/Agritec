@@ -8,13 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/utils";
 import { useCartStore, type CartItem } from "@/store/cart-store";
 import { useEffect, useState, useTransition } from "react";
+import { getBrowserSupabaseClient } from "@/lib/supabase/client";
 
 type Props = {
   prefillItems: CartItem[];
 };
 
 export default function OrderForm({ prefillItems }: Props) {
-  const { items, setItems, updateQuantity, removeItem, clear } = useCartStore();
+  const { items, setItems, addItem, updateQuantity, removeItem, clear } = useCartStore();
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -24,6 +25,29 @@ export default function OrderForm({ prefillItems }: Props) {
   });
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [options, setOptions] = useState<CartItem[]>([]);
+  const [selectedId, setSelectedId] = useState<string>("");
+  const [selectedQty, setSelectedQty] = useState<number>(1);
+  const supabase = getBrowserSupabaseClient();
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      if (!supabase) return;
+      const { data } = await supabase.from("products").select("id,name,price,unit").order("created_at", { ascending: false }).limit(30);
+      if (data) {
+        setOptions(
+          data.map((p) => ({
+            productId: p.id,
+            name: p.name,
+            price: p.price || 0,
+            unit: (p.unit as string | null) || undefined,
+            quantity: 1
+          }))
+        );
+      }
+    };
+    fetchOptions();
+  }, [supabase]);
 
   useEffect(() => {
     if (prefillItems.length > 0) {
@@ -37,7 +61,7 @@ export default function OrderForm({ prefillItems }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) {
-      setMessage("Vui lòng chọn sản phẩm hoặc combo trước khi đặt hàng.");
+      setMessage("Vui lòng chọn sản phẩm hoặc combo trước khi đặt.");
       return;
     }
     startTransition(async () => {
@@ -60,6 +84,15 @@ export default function OrderForm({ prefillItems }: Props) {
     });
   };
 
+  const addSelected = () => {
+    const found = options.find((o) => o.productId === selectedId);
+    if (found) {
+      addItem({ ...found, quantity: selectedQty });
+      setSelectedId("");
+      setSelectedQty(1);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="grid gap-10 md:grid-cols-[1.6fr,1fr]">
       <div className="space-y-6 rounded-3xl border border-surface-border bg-white p-8 shadow-soft">
@@ -72,11 +105,36 @@ export default function OrderForm({ prefillItems }: Props) {
             Xóa giỏ
           </Button>
         </div>
-        {items.length === 0 ? (
-          <p className="rounded-2xl bg-surface-light p-4 text-sm text-slate-600">
-            Chưa có sản phẩm. Chọn sản phẩm hoặc combo từ trang giải pháp/sản phẩm.
-          </p>
-        ) : (
+
+        <div className="rounded-2xl bg-surface-light p-4 text-sm text-slate-700 space-y-3">
+          <p>{items.length === 0 ? "Chưa có sản phẩm. Chọn nhanh bên dưới." : "Thêm sản phẩm khác (tùy chọn):"}</p>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <select
+              value={selectedId}
+              onChange={(e) => setSelectedId(e.target.value)}
+              className="h-11 w-full rounded-xl border border-surface-border px-3 text-sm"
+            >
+              <option value="">-- Chọn sản phẩm --</option>
+              {options.map((opt) => (
+                <option key={opt.productId} value={opt.productId}>
+                  {opt.name} ({formatCurrency(opt.price)})
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              min={1}
+              value={selectedQty}
+              onChange={(e) => setSelectedQty(Math.max(1, Number(e.target.value)))}
+              className="h-11 w-24 rounded-xl border border-surface-border px-3 text-sm"
+            />
+            <Button type="button" variant="accent" size="sm" className="sm:w-auto" disabled={!selectedId} onClick={addSelected}>
+              Thêm
+            </Button>
+          </div>
+        </div>
+
+        {items.length > 0 && (
           <div className="space-y-4">
             {items.map((item) => (
               <div
