@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ShoppingCart } from "lucide-react";
+
 import { getProductBySlug } from "@/lib/queries";
 import { SectionHeader } from "@/components/section-header";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 
@@ -25,7 +27,7 @@ export default async function ProductDetailPage({ params }: Props) {
             {primaryImage ? (
               <img src={primaryImage.url} alt={product.name} className="h-[420px] w-full object-contain" />
             ) : (
-              <div className="flex h-[420px] items-center justify-center bg-surface-light text-slate-500">Đang cập nhật hình ảnh</div>
+              <div className="flex h-[420px] items-center justify-center bg-surface-light text-slate-500">Đang cập nhật hình</div>
             )}
           </div>
           {images.length > 1 && (
