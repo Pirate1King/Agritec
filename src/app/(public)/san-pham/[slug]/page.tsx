@@ -25,9 +25,7 @@ export default async function ProductDetailPage({ params }: Props) {
             {primaryImage ? (
               <img src={primaryImage.url} alt={product.name} className="h-[420px] w-full object-contain" />
             ) : (
-              <div className="flex h-[420px] items-center justify-center bg-surface-light text-slate-500">
-                Đang cập nhật hình ảnh
-              </div>
+              <div className="flex h-[420px] items-center justify-center bg-surface-light text-slate-500">Đang cập nhật hình ảnh</div>
             )}
           </div>
           {images.length > 1 && (
@@ -51,11 +49,11 @@ export default async function ProductDetailPage({ params }: Props) {
             <p className="font-semibold text-slate-800">Hướng dẫn sử dụng</p>
             <p className="mt-2">{product.usage}</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <AddToCartButton
               size="lg"
               variant="accent"
-              label="Thêm vào giỏ"
+              label=""
               item={{
                 productId: product.id,
                 name: product.name,
@@ -66,11 +64,11 @@ export default async function ProductDetailPage({ params }: Props) {
               }}
             />
             <Button variant="secondary" size="lg" asChild>
-              <Link href={`/dat-hang?product=${product.slug}`}>Mua nhanh</Link>
+              <Link href={`/dat-hang?product=${product.slug}`}>Mua</Link>
             </Button>
             <Button variant="ghost" size="lg" asChild>
               <Link href="https://zalo.me" target="_blank">
-                Tư vấn Zalo
+                Tư vấn
               </Link>
             </Button>
           </div>
