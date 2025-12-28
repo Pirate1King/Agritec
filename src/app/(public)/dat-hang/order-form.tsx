@@ -1,4 +1,7 @@
-"use client";
+'use client';
+
+import { useEffect, useState, useTransition } from "react";
+import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 
 import { submitOrder } from "@/app/actions/orders";
 import { Button } from "@/components/ui/button";
@@ -7,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/utils";
 import { useCartStore, type CartItem } from "@/store/cart-store";
-import { useEffect, useState, useTransition } from "react";
 import { getBrowserSupabaseClient } from "@/lib/supabase/client";
 
 type Props = {
@@ -28,12 +30,17 @@ export default function OrderForm({ prefillItems }: Props) {
   const [options, setOptions] = useState<CartItem[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
   const [selectedQty, setSelectedQty] = useState<number>(1);
+  const [openDetails, setOpenDetails] = useState<Record<string, boolean>>({});
   const supabase = getBrowserSupabaseClient();
 
   useEffect(() => {
     const fetchOptions = async () => {
       if (!supabase) return;
-      const { data } = await supabase.from("products").select("id,name,price,unit").order("created_at", { ascending: false }).limit(30);
+      const { data } = await supabase
+        .from("products")
+        .select("id,name,price,unit")
+        .order("created_at", { ascending: false })
+        .limit(30);
       if (data) {
         setOptions(
           data.map((p) => ({
@@ -56,7 +63,7 @@ export default function OrderForm({ prefillItems }: Props) {
   }, [prefillItems, setItems]);
 
   const total = items.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
-  const transferReference = form.phone ? `AGRITEC ${form.phone}` : "AGRITEC + SĐT của bạn";
+  const transferReference = form.phone ? `AGRITEC ${form.phone}` : "AGRITEC + SDT cua ban";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,7 +113,7 @@ export default function OrderForm({ prefillItems }: Props) {
           </Button>
         </div>
 
-        <div className="rounded-2xl bg-surface-light p-4 text-sm text-slate-700 space-y-3">
+        <div className="space-y-3 rounded-2xl bg-surface-light p-4 text-sm text-slate-700">
           <p>{items.length === 0 ? "Chưa có sản phẩm. Chọn nhanh bên dưới." : "Thêm sản phẩm khác (tùy chọn):"}</p>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <select
@@ -141,9 +148,44 @@ export default function OrderForm({ prefillItems }: Props) {
                 key={item.productId}
                 className="flex flex-col gap-3 rounded-2xl border border-surface-border p-4 md:flex-row md:items-center md:justify-between"
               >
-                <div>
+                <div className="space-y-1">
                   <p className="font-semibold text-slate-900">{item.name}</p>
-                  <p className="text-sm text-slate-500">{formatCurrency(item.price)}</p>
+                  <p className="text-sm text-slate-500">
+                    {item.price != null ? formatCurrency(item.price) : "Đang cập nhật giá"}
+                  </p>
+                  {item.children && item.children.length > 0 && (
+                    <div className="text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setOpenDetails((prev) => ({ ...prev, [item.productId]: !prev[item.productId] }))}
+                        className="flex items-center gap-1 font-semibold text-brand-blue"
+                      >
+                        {openDetails[item.productId] ? (
+                          <>
+                            <ChevronDown className="h-3 w-3" />
+                            Ẩn
+                          </>
+                        ) : (
+                          <>
+                            <ChevronRight className="h-3 w-3" />
+                            Chi tiết
+                          </>
+                        )}
+                      </button>
+                      {openDetails[item.productId] && (
+                        <div className="mt-2 space-y-1 rounded-lg bg-surface-light px-3 py-2 text-slate-700">
+                          {item.children.map((child, idx) => (
+                            <div key={`${item.productId}-child-${idx}`} className="flex items-center justify-between">
+                              <span>
+                                {child.name} × {child.quantity || 1}
+                              </span>
+                              {child.price != null && <span>{formatCurrency(child.price)}</span>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <input
@@ -153,8 +195,8 @@ export default function OrderForm({ prefillItems }: Props) {
                     onChange={(e) => updateQuantity(item.productId, Number(e.target.value))}
                     className="h-10 w-20 rounded-lg border border-surface-border px-2 text-center"
                   />
-                  <Button variant="ghost" size="sm" type="button" onClick={() => removeItem(item.productId)}>
-                    Xóa
+                  <Button variant="ghost" size="sm" type="button" onClick={() => removeItem(item.productId)} aria-label="Xóa">
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>

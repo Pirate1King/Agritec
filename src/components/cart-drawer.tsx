@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
-import { Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cart-store";
@@ -10,6 +10,7 @@ import { formatCurrency } from "@/lib/utils";
 
 export function CartDrawer() {
   const { items, isOpen, close, updateQuantity, removeItem, clear } = useCartStore();
+  const [openDetails, setOpenDetails] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (isOpen) {
@@ -52,45 +53,82 @@ export function CartDrawer() {
           ) : (
             <div className="space-y-4">
               {items.map((item) => (
-                <div key={item.productId} className="flex gap-3 rounded-2xl border border-surface-border p-3 shadow-sm">
-                  <div className="h-16 w-16 overflow-hidden rounded-xl bg-surface-light">
-                    {item.image ? (
-                      <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-xs text-slate-500">No image</div>
-                    )}
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <p className="text-sm font-semibold text-brand-blue">{item.name}</p>
-                    {item.unit && <p className="text-xs text-slate-500">Đơn vị: {item.unit}</p>}
-                    {item.price != null && <p className="text-sm font-semibold text-slate-900">{formatCurrency(item.price)}</p>}
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center rounded-full border border-surface-border">
+                <div key={item.productId} className="rounded-2xl border border-surface-border p-3 shadow-sm">
+                  <div className="flex gap-3">
+                    <div className="h-16 w-16 overflow-hidden rounded-xl bg-surface-light">
+                      {item.image ? (
+                        <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-xs text-slate-500">No image</div>
+                      )}
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-brand-blue">{item.name}</p>
+                        {item.children && item.children.length > 0 && (
+                          <button
+                            onClick={() =>
+                              setOpenDetails((prev) => ({ ...prev, [item.productId]: !prev[item.productId] }))
+                            }
+                            className="flex items-center gap-1 text-xs font-semibold text-brand-blue"
+                          >
+                            {openDetails[item.productId] ? (
+                              <>
+                                <ChevronDown className="h-3 w-3" /> Ẩn
+                              </>
+                            ) : (
+                              <>
+                                <ChevronRight className="h-3 w-3" /> Chi tiết
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                      {item.unit && <p className="text-xs text-slate-500">Đơn vị: {item.unit}</p>}
+                      {item.price != null && <p className="text-sm font-semibold text-slate-900">{formatCurrency(item.price)}</p>}
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center rounded-full border border-surface-border">
+                          <button
+                            onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))}
+                            className="grid h-8 w-8 place-items-center text-slate-700 hover:text-brand-blue"
+                            aria-label="Giảm"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </button>
+                          <span className="min-w-[32px] text-center text-sm font-semibold">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                            className="grid h-8 w-8 place-items-center text-slate-700 hover:text-brand-blue"
+                            aria-label="Tăng"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
+                        </div>
                         <button
-                          onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))}
-                          className="grid h-8 w-8 place-items-center text-slate-700 hover:text-brand-blue"
-                          aria-label="Giảm"
+                          onClick={() => removeItem(item.productId)}
+                          aria-label="Xóa"
+                          className="text-slate-500 transition hover:text-brand-orange"
                         >
-                          <Minus className="h-4 w-4" />
-                        </button>
-                        <span className="min-w-[32px] text-center text-sm font-semibold">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                          className="grid h-8 w-8 place-items-center text-slate-700 hover:text-brand-blue"
-                          aria-label="Tăng"
-                        >
-                          <Plus className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
-                      <button
-                        onClick={() => removeItem(item.productId)}
-                        aria-label="Xóa"
-                        className="text-slate-500 transition hover:text-brand-orange"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
                     </div>
                   </div>
+                  {item.children && item.children.length > 0 && openDetails[item.productId] && (
+                    <div className="mt-3 rounded-xl bg-surface-light px-3 py-2 text-xs text-slate-700">
+                      <p className="mb-2 font-semibold text-slate-800">Chi tiết combo</p>
+                      <div className="space-y-1">
+                        {item.children.map((child, idx) => (
+                          <div key={`${item.productId}-child-${idx}`} className="flex items-center justify-between">
+                            <span>
+                              {child.name} × {child.quantity || 1}
+                            </span>
+                            {child.price != null && <span>{formatCurrency(child.price)}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

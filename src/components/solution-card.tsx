@@ -19,6 +19,19 @@ export function SolutionCard({ solution }: Props) {
   const handleAddCombos = () => {
     if (!solution.combos || solution.combos.length === 0) return;
     solution.combos.forEach((combo) => {
+      const comboPrice =
+        combo.price ??
+        combo.items?.reduce((sum, item) => {
+          const itemPrice = item.product?.price || 0;
+          return sum + itemPrice * (item.quantity || 1);
+        }, 0) ??
+        0;
+      const children =
+        combo.items?.map((item) => ({
+          name: item.product?.name || "Sản phẩm",
+          quantity: item.quantity,
+          price: item.product?.price ?? null
+        })) || [];
       const fallbackImage =
         combo.items?.find((i) => i.product?.images && i.product.images.length > 0)?.product?.images?.[0]?.url ||
         solution.hero_url ||
@@ -27,9 +40,10 @@ export function SolutionCard({ solution }: Props) {
         productId: `combo-${combo.id}`,
         name: combo.name,
         quantity: 1,
-        price: combo.price ?? null,
+        price: comboPrice,
         unit: "combo",
-        image: fallbackImage
+        image: fallbackImage,
+        children
       });
     });
     open();
@@ -69,10 +83,10 @@ export function SolutionCard({ solution }: Props) {
             type="button"
             onClick={handleAddCombos}
             disabled={!solution.combos || solution.combos.length === 0}
-            className="gap-2"
+            aria-label="Thêm combo vào giỏ hàng"
+            className="px-3"
           >
             <ShoppingCart className="h-4 w-4" aria-hidden />
-            Thêm combo
           </Button>
         </div>
       </div>

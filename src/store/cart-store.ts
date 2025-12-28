@@ -7,6 +7,11 @@ export type CartItem = {
   price?: number | null;
   unit?: string | null;
   image?: string | null;
+  children?: {
+    name: string;
+    quantity?: number;
+    price?: number | null;
+  }[];
 };
 
 type CartState = {
