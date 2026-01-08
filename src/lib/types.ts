@@ -69,3 +69,21 @@ export type OrderPayload = {
   payment_method: "cod" | "bank_transfer";
   items: OrderItem[];
 };
+
+export type NewsItem = {
+  id: string;
+  title: string;
+  excerpt?: string | null;
+  content?: string | null;
+  image_url?: string | null;
+  link_url?: string | null;
+  sort_order?: number | null;
+};
+
+export type Partner = {
+  id: string;
+  name: string;
+  logo_url?: string | null;
+  website_url?: string | null;
+  sort_order?: number | null;
+};

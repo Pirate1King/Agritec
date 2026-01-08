@@ -8,7 +8,9 @@ import { AdminUserMenu } from "@/components/admin/user-menu";
 const navItems = [
   { href: "/admin/solutions", label: "Solutions" },
   { href: "/admin/products", label: "Products" },
-  { href: "/admin/orders", label: "Orders" }
+  { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/news", label: "News" },
+  { href: "/admin/partners", label: "Partners" }
 ];
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {

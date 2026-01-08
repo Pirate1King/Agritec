@@ -1,9 +1,9 @@
 import { cache } from "react";
-import { sampleSolutions, sampleProducts } from "@/data/static";
+import { sampleSolutions, sampleProducts, sampleNews, samplePartners } from "@/data/static";
 import { getServerSupabaseClient } from "./supabase/server";
 import { getServiceSupabase } from "./supabase/service";
 import { Database } from "./supabase/types";
-import { Product, Solution, SolutionCombo } from "./types";
+import { Product, Solution, SolutionCombo, NewsItem, Partner } from "./types";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"] & {
   product_images?: Database["public"]["Tables"]["product_images"]["Row"][];
@@ -214,4 +214,35 @@ export const getComboBySlug = cache(async (slug: string): Promise<SolutionCombo 
       product: item.products ? mapProduct(item.products) : undefined
     })) || []
   };
+});
+
+export const getNews = cache(async (): Promise<NewsItem[]> => {
+  const supabase = getReadableClient();
+  if (!supabase) return sampleNews;
+
+  const { data, error } = await supabase
+    .from("news")
+    .select("id, title, excerpt, content, image_url, link_url, sort_order, is_published")
+    .or("is_published.is.null,is_published.eq.true")
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  if (error || !data) return sampleNews;
+  return data as NewsItem[];
+});
+
+export const getPartners = cache(async (): Promise<Partner[]> => {
+  const supabase = getReadableClient();
+  if (!supabase) return samplePartners;
+
+  const { data, error } = await supabase
+    .from("partners")
+    .select("id, name, logo_url, website_url, sort_order, is_active")
+    .or("is_active.is.null,is_active.eq.true")
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (error || !data) return samplePartners;
+  return data as Partner[];
 });

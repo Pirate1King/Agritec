@@ -1,4 +1,4 @@
-// @ts-nocheck
+﻿// @ts-nocheck
 "use client";
 
 import Link from "next/link";
@@ -14,8 +14,8 @@ import { Menu, X } from "lucide-react";
 const navLinks = [
   { href: "/giai-phap", label: "Giải pháp" },
   { href: "/san-pham", label: "Sản phẩm" },
-  { href: "/#he-giai-phap", label: "Hệ giải pháp" },
-  { href: "/#mo-hinh-trien-khai", label: "Mô hình triển khai" }
+  { href: "/livestock#he-giai-phap", label: "Hệ giải pháp" },
+  { href: "/livestock#mo-hinh-trien-khai", label: "Mô hình triển khai" }
 ];
 
 export function Navbar() {
@@ -39,16 +39,18 @@ export function Navbar() {
 
   const isActive = (href: string) => {
     const currentHash = hash || (typeof window !== "undefined" ? window.location.hash : "");
-    if (href.startsWith("/#")) {
-      const targetHash = href.replace("/", "");
-      return pathname === "/" && currentHash === targetHash;
+    if (href.includes("#")) {
+      const [path, rawHash] = href.split("#");
+      const targetHash = `#${rawHash}`;
+      return pathname === path && currentHash === targetHash;
     }
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
   const handleAnchorClick = (href: string) => {
-    if (href.startsWith("/#")) {
-      setHash(href.replace("/", ""));
+    if (href.includes("#")) {
+      const targetHash = `#${href.split("#")[1]}`;
+      setHash(targetHash);
     }
     setOpen(false);
   };
@@ -56,7 +58,7 @@ export function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-white/90 shadow-sm backdrop-blur">
       <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/livestock" className="flex items-center gap-3">
           <Image src="/logo.png" alt="Agritec" width={36} height={36} className="rounded-lg" />
           <div className="leading-tight">
             <p className="font-heading text-lg text-brand-blue">AGRITEC</p>

@@ -414,3 +414,85 @@ export async function deleteCombo(prev: ActionResult | undefined, formData: Form
   revalidatePath("/admin/solutions");
   return { success: true, message: "Đã xoá combo" };
 }
+
+export async function upsertNews(prev: ActionResult | undefined, formData: FormData): Promise<ActionResult> {
+  const supabase = getServiceSupabase();
+  const newsId = formData.get("news_id")?.toString() || null;
+  const title = formData.get("title")?.toString().trim() || "";
+  const excerpt = formData.get("excerpt")?.toString().trim() || null;
+  const content = formData.get("content")?.toString().trim() || null;
+  const image_url = formData.get("image_url")?.toString().trim() || null;
+  const link_url = formData.get("link_url")?.toString().trim() || null;
+  const sort_order = formData.get("sort_order") ? Number(formData.get("sort_order")) : 0;
+  const is_published = formData.get("is_published") === "on";
+
+  if (!title) return { success: false, message: "Thieu tieu de" };
+
+  if (newsId) {
+    const { error } = await supabase
+      .from("news")
+      .update({ title, excerpt, content, image_url, link_url, sort_order, is_published })
+      .eq("id", newsId);
+    if (error) return { success: false, message: error.message };
+  } else {
+    const { error } = await supabase
+      .from("news")
+      .insert({ title, excerpt, content, image_url, link_url, sort_order, is_published });
+    if (error) return { success: false, message: error.message };
+  }
+
+  revalidatePath("/admin/news");
+  if (newsId) revalidatePath(`/admin/news/${newsId}`);
+  revalidatePath("/");
+  return { success: true, message: "Da luu tin tuc" };
+}
+
+export async function deleteNews(prev: ActionResult | undefined, formData: FormData): Promise<ActionResult> {
+  const supabase = getServiceSupabase();
+  const id = formData.get("news_id")?.toString();
+  if (!id) return { success: false, message: "Thieu ID tin tuc" };
+  const { error } = await supabase.from("news").delete().eq("id", id);
+  if (error) return { success: false, message: error.message };
+  revalidatePath("/admin/news");
+  revalidatePath("/");
+  redirect("/admin/news");
+}
+
+export async function upsertPartner(prev: ActionResult | undefined, formData: FormData): Promise<ActionResult> {
+  const supabase = getServiceSupabase();
+  const partnerId = formData.get("partner_id")?.toString() || null;
+  const name = formData.get("name")?.toString().trim() || "";
+  const logo_url = formData.get("logo_url")?.toString().trim() || null;
+  const website_url = formData.get("website_url")?.toString().trim() || null;
+  const sort_order = formData.get("sort_order") ? Number(formData.get("sort_order")) : 0;
+  const is_active = formData.get("is_active") === "on";
+
+  if (!name) return { success: false, message: "Thieu ten doi tac" };
+
+  if (partnerId) {
+    const { error } = await supabase
+      .from("partners")
+      .update({ name, logo_url, website_url, sort_order, is_active })
+      .eq("id", partnerId);
+    if (error) return { success: false, message: error.message };
+  } else {
+    const { error } = await supabase.from("partners").insert({ name, logo_url, website_url, sort_order, is_active });
+    if (error) return { success: false, message: error.message };
+  }
+
+  revalidatePath("/admin/partners");
+  if (partnerId) revalidatePath(`/admin/partners/${partnerId}`);
+  revalidatePath("/");
+  return { success: true, message: "Da luu doi tac" };
+}
+
+export async function deletePartner(prev: ActionResult | undefined, formData: FormData): Promise<ActionResult> {
+  const supabase = getServiceSupabase();
+  const id = formData.get("partner_id")?.toString();
+  if (!id) return { success: false, message: "Thieu ID doi tac" };
+  const { error } = await supabase.from("partners").delete().eq("id", id);
+  if (error) return { success: false, message: error.message };
+  revalidatePath("/admin/partners");
+  revalidatePath("/");
+  redirect("/admin/partners");
+}

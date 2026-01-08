@@ -168,3 +168,61 @@ export const sampleSolutions: Solution[] = [
 ];
 
 export const sampleCombos: SolutionCombo[] = sampleSolutions.flatMap((solution) => solution.combos || []);
+
+export const sampleNews = [
+  {
+    id: "news-1",
+    title: "Gia tang hieu qua chan nuoi an toan",
+    excerpt: "Giai phap tong the giup giam rui ro benh va on dinh tang truong.",
+    image_url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
+    link_url: "#",
+    sort_order: 1
+  },
+  {
+    id: "news-2",
+    title: "Toi uu dinh duong va tieu hoa",
+    excerpt: "Combo sinh hoc ho tro duong ruot va giam ap luc khang sinh.",
+    image_url: "https://images.unsplash.com/photo-1471193945509-9ad0617afabf?auto=format&fit=crop&w=1200&q=80",
+    link_url: "#",
+    sort_order: 2
+  },
+  {
+    id: "news-3",
+    title: "Mo hinh trien khai theo giai doan",
+    excerpt: "Danh gia hien trang, thiet ke giai phap va theo doi hieu qua.",
+    image_url: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80",
+    link_url: "#",
+    sort_order: 3
+  }
+];
+
+export const samplePartners = [
+  {
+    id: "partner-1",
+    name: "Agri Partner",
+    logo_url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
+    website_url: "#",
+    sort_order: 1
+  },
+  {
+    id: "partner-2",
+    name: "Feed Mill Group",
+    logo_url: "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=80",
+    website_url: "#",
+    sort_order: 2
+  },
+  {
+    id: "partner-3",
+    name: "Green Farm Co",
+    logo_url: "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=80",
+    website_url: "#",
+    sort_order: 3
+  },
+  {
+    id: "partner-4",
+    name: "AgriTech Lab",
+    logo_url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
+    website_url: "#",
+    sort_order: 4
+  }
+];

@@ -64,3 +64,16 @@ insert into public.combo_items (combo_id, product_id, quantity) values
 ('2b6c05af-3e8d-4ccf-bd26-637c3b667cb2','f1c44a9d-6ddc-4b80-94e2-54b03fa6c1b1',1),
 ('2b6c05af-3e8d-4ccf-bd26-637c3b667cb2','e85c3d1f-8b6b-4ec0-934a-74b903a4eb59',15)
 on conflict do nothing;
+
+insert into public.news (id, title, excerpt, image_url, link_url, sort_order, is_published) values
+('d2f0f10c-7a32-4a3c-8f4c-6b47f5f2c101','Gia tang hieu qua chan nuoi an toan','Giai phap tong the giup giam rui ro benh va on dinh tang truong.','https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80','#',1,true),
+('7e7f1d20-7e3d-42b5-9ac5-03e6a4c38c02','Toi uu dinh duong va tieu hoa','Combo sinh hoc ho tro duong ruot va giam ap luc khang sinh.','https://images.unsplash.com/photo-1471193945509-9ad0617afabf?auto=format&fit=crop&w=1200&q=80','#',2,true),
+('b08da0cb-2b5d-46b9-b5d0-1d8b681cdd03','Mo hinh trien khai theo giai doan','Danh gia hien trang, thiet ke giai phap va theo doi hieu qua.','https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80','#',3,true)
+on conflict (id) do nothing;
+
+insert into public.partners (id, name, logo_url, website_url, sort_order, is_active) values
+('4f2c17c7-cc4d-4e49-a0b6-0f0a13f3c201','Agri Partner','https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80','#',1,true),
+('5b9a4c50-1c86-4a65-98dd-3a6c11c1d202','Feed Mill Group','https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=80','#',2,true),
+('7a19fb86-1f15-4ed0-9c25-4580f2fb6203','Green Farm Co','https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=80','#',3,true),
+('c3f1d799-1cb0-4c6a-9f1c-5d420a7a6204','AgriTech Lab','https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80','#',4,true)
+on conflict (id) do nothing;

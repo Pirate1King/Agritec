@@ -32,6 +32,32 @@ create table if not exists public.products (
 create index if not exists idx_products_published on public.products (is_published);
 create index if not exists idx_products_category on public.products (category);
 
+create table if not exists public.news (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default timezone('utc'::text, now()),
+  title text not null,
+  excerpt text,
+  content text,
+  image_url text,
+  link_url text,
+  sort_order integer default 0,
+  is_published boolean not null default true
+);
+create index if not exists idx_news_published on public.news (is_published);
+create index if not exists idx_news_sort on public.news (sort_order);
+
+create table if not exists public.partners (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default timezone('utc'::text, now()),
+  name text not null,
+  logo_url text,
+  website_url text,
+  sort_order integer default 0,
+  is_active boolean not null default true
+);
+create index if not exists idx_partners_active on public.partners (is_active);
+create index if not exists idx_partners_sort on public.partners (sort_order);
+
 create table if not exists public.product_images (
   id uuid primary key default gen_random_uuid(),
   product_id uuid not null references public.products(id) on delete cascade,
@@ -103,18 +129,40 @@ alter table public.solutions enable row level security;
 alter table public.solution_products enable row level security;
 alter table public.solution_combos enable row level security;
 alter table public.combo_items enable row level security;
+alter table public.news enable row level security;
+alter table public.partners enable row level security;
 
 -- Example policy: allow service role full access (adjust with your admin role)
 do $$
 begin
   if not exists (select 1 from pg_policies where policyname = 'service_role_full_access') then
     create policy service_role_full_access on public.orders for all using (auth.role() = 'service_role') with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where policyname = 'service_role_full_access_products') then
     create policy service_role_full_access_products on public.products for all using (auth.role() = 'service_role') with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where policyname = 'service_role_full_access_solutions') then
     create policy service_role_full_access_solutions on public.solutions for all using (auth.role() = 'service_role') with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where policyname = 'service_role_full_access_combos') then
     create policy service_role_full_access_combos on public.solution_combos for all using (auth.role() = 'service_role') with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where policyname = 'service_role_full_access_combo_items') then
     create policy service_role_full_access_combo_items on public.combo_items for all using (auth.role() = 'service_role') with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where policyname = 'service_role_full_access_solution_products') then
     create policy service_role_full_access_solution_products on public.solution_products for all using (auth.role() = 'service_role') with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where policyname = 'service_role_full_access_product_images') then
     create policy service_role_full_access_product_images on public.product_images for all using (auth.role() = 'service_role') with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where policyname = 'service_role_full_access_order_items') then
     create policy service_role_full_access_order_items on public.order_items for all using (auth.role() = 'service_role') with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where policyname = 'service_role_full_access_news') then
+    create policy service_role_full_access_news on public.news for all using (auth.role() = 'service_role') with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where policyname = 'service_role_full_access_partners') then
+    create policy service_role_full_access_partners on public.partners for all using (auth.role() = 'service_role') with check (true);
   end if;
 end$$;

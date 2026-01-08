@@ -67,6 +67,52 @@ export type Database = {
         };
         Update: Partial<Database["public"]["Tables"]["products"]["Insert"]>;
       };
+      news: {
+        Row: {
+          id: string;
+          created_at: string;
+          title: string;
+          excerpt: string | null;
+          content: string | null;
+          image_url: string | null;
+          link_url: string | null;
+          sort_order: number | null;
+          is_published: boolean;
+        };
+        Insert: {
+          id?: string;
+          created_at?: string;
+          title: string;
+          excerpt?: string | null;
+          content?: string | null;
+          image_url?: string | null;
+          link_url?: string | null;
+          sort_order?: number | null;
+          is_published?: boolean;
+        };
+        Update: Partial<Database["public"]["Tables"]["news"]["Insert"]>;
+      };
+      partners: {
+        Row: {
+          id: string;
+          created_at: string;
+          name: string;
+          logo_url: string | null;
+          website_url: string | null;
+          sort_order: number | null;
+          is_active: boolean;
+        };
+        Insert: {
+          id?: string;
+          created_at?: string;
+          name: string;
+          logo_url?: string | null;
+          website_url?: string | null;
+          sort_order?: number | null;
+          is_active?: boolean;
+        };
+        Update: Partial<Database["public"]["Tables"]["partners"]["Insert"]>;
+      };
       product_images: {
         Row: {
           id: string;
